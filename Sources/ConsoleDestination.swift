@@ -13,6 +13,7 @@ public class ConsoleDestination: BaseDestination {
 
     /// use NSLog instead of print, default is false
     public var useNSLog = false
+
     /// uses colors compatible to Terminal instead of Xcode, default is false
     public var useTerminalColors: Bool = false {
         didSet {
@@ -41,6 +42,8 @@ public class ConsoleDestination: BaseDestination {
 
     override public var defaultHashValue: Int { return 1 }
 
+    private let ansiColorPattern = try? NSRegularExpression(pattern: "\u{001b}[^m]*m", options: [])
+
     public override init() {
         super.init()
         levelColor.verbose = "💜 "     // silver
@@ -55,7 +58,19 @@ public class ConsoleDestination: BaseDestination {
                                 file: String, function: String, line: Int, context: Any? = nil) -> String? {
         let formattedString = super.send(level, msg: msg, thread: thread, file: file, function: function, line: line, context: context)
 
-        if let str = formattedString {
+        if var str = formattedString {
+
+            // Remove any ANSI color codes before printing to Xcode console
+            if let ansiColorPattern = ansiColorPattern, !useTerminalColors {
+                let matches = ansiColorPattern.matches(in: str, options: [], range: NSMakeRange(0, str.characters.count))
+                // remove them in reverse order so original ranges stay valid, otherwise shifting would invalidate them
+                for match in matches.reversed() {
+                    if let matchRange = str.range(for: match.range) {
+                        str.removeSubrange(matchRange)
+                    }
+                }
+            }
+
             if useNSLog {
                 #if os(Linux)
                     print(str)
@@ -67,6 +82,22 @@ public class ConsoleDestination: BaseDestination {
             }
         }
         return formattedString
+    }
+
+}
+
+
+extension String {
+
+    // Proper range with strings containing 💙 thanks to http://stackoverflow.com/a/30404532/1330722
+    func range(for range: NSRange) -> ClosedRange<String.Index>? {
+        guard
+            let from16 = utf16.index(utf16.startIndex, offsetBy: range.location, limitedBy: utf16.endIndex),
+            let to16 = utf16.index(utf16.startIndex, offsetBy: range.location + range.length - 1, limitedBy: utf16.endIndex),
+            let from = from16.samePosition(in: self),
+            let to = to16.samePosition(in: self)
+            else { return nil }
+        return from...to
     }
 
 }
