@@ -55,6 +55,29 @@ open class BaseDestination: Hashable, Equatable {
         public var info = "INFO"
         public var warning = "WARNING"
         public var error = "ERROR"
+
+        public func word(for level: SwiftyBeaver.Level) -> String {
+            var str = ""
+
+            switch level {
+            case SwiftyBeaver.Level.debug:
+                str = debug
+
+            case SwiftyBeaver.Level.info:
+                str = info
+
+            case SwiftyBeaver.Level.warning:
+                str = warning
+
+            case SwiftyBeaver.Level.error:
+                str = error
+
+            default:
+                // Verbose is default
+                str = verbose
+            }
+            return str
+        }
     }
 
     // For a colored log level word in a logged line
@@ -65,6 +88,28 @@ open class BaseDestination: Hashable, Equatable {
         public var info = ""        // blue
         public var warning = ""     // yellow
         public var error = ""       // red
+
+        public func color(for level: SwiftyBeaver.Level) -> String {
+            var color = ""
+
+            switch level {
+            case SwiftyBeaver.Level.debug:
+                color = debug
+
+            case SwiftyBeaver.Level.info:
+                color = info
+
+            case SwiftyBeaver.Level.warning:
+                color = warning
+
+            case SwiftyBeaver.Level.error:
+                color = error
+
+            default:
+                color = verbose
+            }
+            return color
+        }
     }
 
     var reset = ""
@@ -268,50 +313,12 @@ open class BaseDestination: Hashable, Equatable {
 
     /// returns the string of a level
     func levelWord(_ level: SwiftyBeaver.Level) -> String {
-
-        var str = ""
-
-        switch level {
-        case .debug:
-            str = levelString.debug
-
-        case .info:
-            str = levelString.info
-
-        case .warning:
-            str = levelString.warning
-
-        case .error:
-            str = levelString.error
-
-        default:
-            // Verbose is default
-            str = levelString.verbose
-        }
-        return str
+        return levelString.word(for: level)
     }
 
     /// returns color string for level
     func colorForLevel(_ level: SwiftyBeaver.Level) -> String {
-        var color = ""
-
-        switch level {
-        case .debug:
-            color = levelColor.debug
-
-        case .info:
-            color = levelColor.info
-
-        case .warning:
-            color = levelColor.warning
-
-        case .error:
-            color = levelColor.error
-
-        default:
-            color = levelColor.verbose
-        }
-        return color
+        return levelColor.color(for: level)
     }
 
     /// returns the filename of a path
