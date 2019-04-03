@@ -60,21 +60,16 @@ open class BaseDestination: Hashable, Equatable {
             var str = ""
 
             switch level {
-            case SwiftyBeaver.Level.debug:
-                str = debug
-
-            case SwiftyBeaver.Level.info:
-                str = info
-
-            case SwiftyBeaver.Level.warning:
-                str = warning
-
-            case SwiftyBeaver.Level.error:
-                str = error
-
-            default:
-                // Verbose is default
+            case .verbose:
                 str = verbose
+            case .debug:
+                str = debug
+            case .info:
+                str = info
+            case .warning:
+                str = warning
+            case .error:
+                str = error
             }
             return str
         }

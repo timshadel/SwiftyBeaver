@@ -62,7 +62,7 @@ public class ConsoleDestination: BaseDestination {
 
             // Remove any ANSI color codes before printing to Xcode console
             if let ansiColorPattern = ansiColorPattern, !useTerminalColors {
-                let matches = ansiColorPattern.matches(in: str, options: [], range: NSMakeRange(0, str.characters.count))
+                let matches = ansiColorPattern.matches(in: str, options: [], range: NSMakeRange(0, str.count))
                 // remove them in reverse order so original ranges stay valid, otherwise shifting would invalidate them
                 for match in matches.reversed() {
                     if let matchRange = str.range(for: match.range) {
